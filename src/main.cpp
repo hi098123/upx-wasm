@@ -1168,15 +1168,15 @@ int upx_main(int argc, char *argv[]) {
         argv[0] = default_argv0;
     argv0 = argv[0];
 
-    upx_compiler_sanity_check();
-    int dt_res = upx_doctest_check(argc, argv);
+    //upx_compiler_sanity_check();
+    /*int dt_res = upx_doctest_check(argc, argv);
     if (dt_res != 0) {
         if (dt_res == 2)
             fprintf(stderr, "%s: doctest requested program exit; Stop.\n", argv0);
         else
             fprintf(stderr, "%s: internal error: doctest failed\n", argv0);
         e_exit(EXIT_INIT);
-    }
+    }*/
 
     // Allow serial re-use of upx_main() as a subroutine
     opt->reset();

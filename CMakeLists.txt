@@ -145,8 +145,8 @@ if(NOT MSVC)
     # use -O2 instead of -O3 to reduce code size
     string(REGEX REPLACE "(^| )-O3( |$$)" "\\1-O2\\2" a "${CMAKE_C_FLAGS_RELEASE}")
     string(REGEX REPLACE "(^| )-O3( |$$)" "\\1-O2\\2" b "${CMAKE_CXX_FLAGS_RELEASE}")
-    set(CMAKE_C_FLAGS_RELEASE "${a}" CACHE STRING "Flags used by the C compiler during RELEASE builds." FORCE)
-    set(CMAKE_CXX_FLAGS_RELEASE "${b}" CACHE STRING "Flags used by the CXX compiler during RELEASE builds." FORCE)
+    #set(CMAKE_C_FLAGS_RELEASE "${a}" CACHE STRING "Flags used by the C compiler during RELEASE builds." FORCE)
+    #set(CMAKE_CXX_FLAGS_RELEASE "${b}" CACHE STRING "Flags used by the CXX compiler during RELEASE builds." FORCE)
 endif()
 
 if(MSVC)
@@ -185,7 +185,7 @@ function(upx_sanitize_target t)
             # default sanitizer for Debug builds
             target_compile_options(${t} PRIVATE $<$<CONFIG:Debug>:-fsanitize=undefined -fsanitize-undefined-trap-on-error -fstack-protector-all>)
             # default sanitizer for Release builds
-            target_compile_options(${t} PRIVATE $<$<CONFIG:Release>:-fstack-protector>)
+            #target_compile_options(${t} PRIVATE $<$<CONFIG:Release>:-fstack-protector>)
         endif()
     endif()
 endfunction()
