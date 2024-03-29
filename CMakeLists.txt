@@ -232,10 +232,72 @@ if(NOT CMAKE_C_COMPILER_ID MATCHES "^MSVC")
     endif()
 endif()
 
+<<<<<<< HEAD
 # examine MinGW/Cygwin compiler configuration
 if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.git")
     upx_print_mingw_symbols()
 endif()
+=======
+# compile a target with -O2 optimization even in Debug build
+function(upx_compile_target_debug_with_O2)
+    foreach(t ${ARGV})
+        if(MSVC_FRONTEND)
+            # MSVC uses some Debug compilation options like -RTC1 that are incompatible with -O2
+        else()
+            target_compile_options(${t} PRIVATE $<$<CONFIG:Debug>:-O2>)
+        endif()
+    endforeach()
+endfunction()
+
+# compile a source file with -O2 optimization even in Debug build; messy because of CMake limitations
+function(upx_compile_source_debug_with_O2)
+    set(flags "$<$<CONFIG:Debug>:-O2>")
+    if(${CMAKE_VERSION} VERSION_LESS "3.8")
+        # 3.8: The COMPILE_FLAGS source file property learned to support generator expressions
+        if(is_multi_config OR NOT CMAKE_BUILD_TYPE MATCHES "^Debug$")
+            return()
+        endif()
+        set(flags "-O2")
+    endif()
+    if(CMAKE_GENERATOR MATCHES "Xcode") # multi-config
+        # NOTE: Xcode does not support per-config per-source COMPILE_FLAGS (as of CMake 3.27.7)
+        return()
+    endif()
+    foreach(t ${ARGV})
+        if(MSVC_FRONTEND)
+            # MSVC uses some Debug compilation options like -RTC1 that are incompatible with -O2
+        else()
+            get_source_file_property(prop ${t} COMPILE_FLAGS)
+            if(prop MATCHES "^(NOTFOUND)?$")
+                set_source_files_properties(${t} PROPERTIES COMPILE_FLAGS "${flags}")
+            else()
+                set_source_files_properties(${t} PROPERTIES COMPILE_FLAGS "${prop} ${flags}")
+            endif()
+        endif()
+    endforeach()
+endfunction()
+
+# sanitize a target
+function(upx_sanitize_target)
+    foreach(t ${ARGV})
+        if(UPX_CONFIG_DISABLE_SANITIZE)
+            # no-op
+        elseif(MSVC_FRONTEND)
+            # MSVC uses -GS (similar to -fstack-protector) by default
+        elseif(MINGW OR CYGWIN)
+            # avoid link errors with current MinGW-w64 versions
+            # see https://www.mingw-w64.org/contribute/#sanitizers-asan-tsan-usan
+        else()
+            # default sanitizer for Debug builds
+            target_compile_options(${t} PRIVATE $<$<CONFIG:Debug>:-fsanitize=undefined -fsanitize-undefined-trap-on-error -fstack-protector-all>)
+            # default sanitizer for Release builds
+            target_compile_options(${t} PRIVATE $<$<CONFIG:MinSizeRel>:-fstack-protector>)
+            #target_compile_options(${t} PRIVATE $<$<CONFIG:Release>:-fstack-protector>)
+            target_compile_options(${t} PRIVATE $<$<CONFIG:RelWithDebInfo>:-fstack-protector>)
+        endif()
+    endforeach()
+endfunction()
+>>>>>>> 0b69bec8c520477b7cb4fa3c75cb811fdf26de46
 
 #***********************************************************************
 # targets
