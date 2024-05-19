@@ -407,7 +407,7 @@ static void unlink_ofile(char *oname) noexcept {
 }
 
 int do_files(int i, int argc, char *argv[]) may_throw {
-    upx_compiler_sanity_check();
+    //upx_compiler_sanity_check();
     if (opt->verbose >= 1) {
         show_header();
         UiPacker::uiHeader();
